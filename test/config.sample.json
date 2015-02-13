@@ -1,4 +1,5 @@
 {
   "secretKey": "SECRET_KEY",
-  "cardToken": "CARD_TOKEN"
+  "cardToken": "CARD_TOKEN",
+  "chargeID": "CHARGE_ID"
 }
