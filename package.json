@@ -33,6 +33,11 @@
     "nock": "^0.59.1"
   },
   "jshintConfig": {
+    "strict": true,
+    "undef": true,
+    "unused": true,
+    "nonbsp": true,
+    "trailing": true,
     "curly": true,
     "eqeqeq": true,
     "freeze": true,

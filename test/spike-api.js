@@ -70,7 +70,7 @@ describe('SpikeAPI', function() {
       }
       var client = new SpikeAPI();
       client.postCharge('JPY', 1080, testConfig.cardToken, products,
-                        function(err, result) {
+                        function(err) {
         err.should.to.be.an.instanceof(Error);
         err.should.to.have.property('message', '401 Unauthorized');
         done();
@@ -185,7 +185,7 @@ describe('SpikeAPI', function() {
           });
       }
       var client = new SpikeAPI();
-      client.getCharge(testConfig.chargeID, function(err, result) {
+      client.getCharge(testConfig.chargeID, function(err) {
         err.should.to.be.an.instanceof(Error);
         err.should.to.have.property('message', '401 Unauthorized');
         done();
