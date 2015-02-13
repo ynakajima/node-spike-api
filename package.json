@@ -8,7 +8,8 @@
   },
   "scripts": {
     "test": "npm run lint && mocha",
-    "lint": "jshint lib/*.js test/*.js && echo Lint passed."
+    "lint": "jshint lib/*.js test/*.js && echo Lint passed.",
+    "actual-test": "npm run lint && env ACTUAL_TEST=1 mocha"
   },
   "repository": {
     "type": "git",
@@ -28,7 +29,8 @@
   "devDependencies": {
     "mocha": "^2.1.0",
     "chai": "^2.0.0",
-    "jshint": "^2.6.0"
+    "jshint": "^2.6.0",
+    "nock": "^0.59.1"
   },
   "jshintConfig": {
     "curly": true,
@@ -38,7 +40,7 @@
     "newcap": true,
     "quotmark": "single",
     "maxdepth": 3,
-    "maxstatements": 15,
+    "maxstatements": 20,
     "maxlen": 80,
     "eqnull": true,
     "funcscope": true,
@@ -46,5 +48,9 @@
     "debug": true,
     "devel": true,
     "mocha": true
+  },
+  "dependencies": {
+    "lodash": "^3.2.0",
+    "request": "^2.53.0"
   }
 }
