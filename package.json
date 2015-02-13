@@ -1,0 +1,27 @@
+{
+  "name": "spike-api",
+  "version": "0.0.0",
+  "description": "An asynchronous client library for the SPIKE REST API.",
+  "main": "./lib/spike-api.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/ynakajima/node-spike-api.git"
+  },
+  "keywords": [
+    "SPIKE",
+    "eCommerce",
+    "transactions"
+  ],
+  "author": "Yuhta Nakajima <yuhta.nakajima@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ynakajima/node-spike-api/issues"
+  },
+  "homepage": "https://github.com/ynakajima/node-spike-api"
+}
