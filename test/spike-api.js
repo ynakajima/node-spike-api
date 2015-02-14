@@ -256,13 +256,13 @@ describe('SpikeAPI', function() {
 
 
   /**
-   * SpileAPI#postRefund()
+   * SpileAPI#refundCharge()
    */
-  describe('#postRefund()', function() {
+  describe('#refundCharge()', function() {
 
     it('should return an error when invalid arguments.', function(done) {
       var client = new SpikeAPI();
-      client.postRefund('', function(err) {
+      client.refundCharge('', function(err) {
         err.should.to.be.an.instanceof(Error);
         done();
       });
@@ -271,7 +271,7 @@ describe('SpikeAPI', function() {
     it('should throw an error ' +
          'when invalid arguments and no callback.', function() {
       var client = new SpikeAPI();
-      client.postRefund.should.throw(Error);
+      client.refundCharge.should.throw(Error);
     });
 
     it('should return an error when invalid secret key.', function(done) {
@@ -283,7 +283,7 @@ describe('SpikeAPI', function() {
           });
       }
       var client = new SpikeAPI();
-      client.postRefund('xxxxx', function(err) {
+      client.refundCharge('xxxxx', function(err) {
         err.should.to.be.an.instanceof(Error);
         err.should.to.have.property('message', '401 Unauthorized');
         done();
@@ -304,7 +304,7 @@ describe('SpikeAPI', function() {
           });
       }
       var client = new SpikeAPI({secretKey: testConfig.secretKey});
-      client.postRefund(invalidID, function(err, result) {
+      client.refundCharge(invalidID, function(err, result) {
         err.should.to.be.an.instanceof(Error);
         err.should.to.have.property('message', '400 Bad Request');
         result.should.to.have.property('error');
@@ -334,7 +334,7 @@ describe('SpikeAPI', function() {
           return done(err);
         }
 
-        // test #postRefund()
+        // test #refundCharge()
         var chargeID = result.id;
         if (!isActualTest) {
           nock('https://api.spike.cc/')
@@ -359,7 +359,7 @@ describe('SpikeAPI', function() {
         }
 
         var client = new SpikeAPI({secretKey: testConfig.secretKey});
-        client.postRefund(chargeID, function(err, result) {
+        client.refundCharge(chargeID, function(err, result) {
           should.equal(err, null);
           result.should.to.have.property('id', chargeID);
           result.should.to.have.property('object', 'charge');
