@@ -5,16 +5,16 @@ var nock = require('nock');
 var SpikeAPI = require('../lib/spike-api').SpikeAPI;
 var Product = require('../lib/spike-api').Product;
 var products = [
-    new Product({
-      id: '0001',
-      title: 'product A',
-      description: 'desc',
-      price: 1000,
-      currency: 'JPY',
-      count: 1,
-      stock: 100
-    })
-  ];
+  new Product({
+    id: '0001',
+    title: 'product A',
+    description: 'desc',
+    price: 1000,
+    currency: 'JPY',
+    count: 1,
+    stock: 100
+  })
+];
 
 var isActualTest = typeof process.env.ACTUAL_TEST !== 'undefined';
 var testConfig = isActualTest ?
