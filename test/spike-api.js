@@ -253,5 +253,93 @@ describe('SpikeAPI', function() {
     });
   });
 
+
+  /**
+   * SpileAPI#getChargeList()
+   */
+  describe('#getChargeList()', function() {
+
+    it('should return an error when invalid arguments.', function(done) {
+      var client = new SpikeAPI();
+      client.getChargeList('', function(err) {
+        err.should.to.be.an.instanceof(Error);
+        done();
+      });
+    });
+
+    it('should throw an error ' +
+         'when invalid arguments and no callback.', function() {
+      var client = new SpikeAPI();
+      client.getChargeList.should.throw(Error);
+    });
+
+    it('should return an error when invalid secret key.', function(done) {
+      if (!isActualTest) {
+        nock('https://api.spike.cc/')
+          .get('/v1/charges?limit=10')
+          .reply(401, {}, {
+            Status: '401 Unauthorized'
+          });
+      }
+      var client = new SpikeAPI();
+      client.getChargeList(function(err) {
+        err.should.to.be.an.instanceof(Error);
+        err.should.to.have.property('message', '401 Unauthorized');
+        done();
+      });
+    });
+
+    it('should return an error when invalid limit.', function(done) {
+      if (!isActualTest) {
+        nock('https://api.spike.cc/')
+          .get('/v1/charges?limit=200')
+          .reply(400, {
+            error: {
+              type: 'invalid_request_error'
+            }
+          }, {
+            Status: '400 Bad Request'
+          });
+      }
+      var client = new SpikeAPI({secretKey: testConfig.secretKey});
+      client.getChargeList(200, function(err, result) {
+        err.should.to.be.an.instanceof(Error);
+        err.should.to.have.property('message', '400 Bad Request');
+        result.should.to.have.property('error');
+        result.error.should.to.have.property(
+          'type', 'invalid_request_error');
+        done();
+      });
+    });
+
+    it('should return charge info when valid arguments.', function(done) {
+      if (!isActualTest) {
+        nock('https://api.spike.cc/')
+          .get('/v1/charges?limit=1')
+          .reply(200, {
+            'object': 'list',
+            'url': '/v1/charges',
+            'has_more': true,
+            'data': [
+              {id: 'xxxxxxx1', object: 'charge'},
+              {id: 'xxxxxxx2', object: 'charge'}
+            ]
+          });
+      }
+      var client = new SpikeAPI({secretKey: testConfig.secretKey});
+      client.getChargeList(1, function(err, result) {
+        should.equal(err, null);
+        result.should.to.be.a('object');
+        result.should.to.have.property('object', 'list');
+        result.should.to.have.property('url', '/v1/charges');
+        result.should.to.have.property('has_more', true);
+        result.data.should.to.have.length(2);
+        result.data[0].should.to.have.property('object', 'charge');
+        result.data[1].should.to.have.property('object', 'charge');
+        done();
+      });
+    });
+  });
+
 });
 
