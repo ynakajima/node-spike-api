@@ -1,6 +1,6 @@
 {
   "name": "spike-api",
-  "version": "0.6.1",
+  "version": "0.6.2",
   "description": "SPIKE REST API client library for node.js",
   "main": "./lib/spike-api.js",
   "directories": {
@@ -9,7 +9,7 @@
   "scripts": {
     "test": "istanbul cover ./node_modules/mocha/bin/_mocha -- -R spec",
     "pretest": "jshint lib/*.js test/*.js && echo Lint passed.",
-    "actual-test": "npm run lint && env ACTUAL_TEST=1 mocha -t 6000",
+    "actual-test": "npm run pretest && env ACTUAL_TEST=1 mocha -t 6000",
     "coveralls": "cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage"
   },
   "repository": {
