@@ -241,7 +241,7 @@ describe('SpikeAPI', function() {
         result.should.to.be.a('object');
         result.should.to.have.property('id', testConfig.chargeID);
         result.should.to.have.property('object', 'charge');
-        result.should.to.have.property('created', 1423818584);
+        result.should.to.have.property('created');
         result.should.to.have.property('livemode', false);
         result.should.to.have.property('paid', true);
         result.should.to.have.property('amount', 1080);
