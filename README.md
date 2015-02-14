@@ -193,3 +193,6 @@ client.getChargeList(limit, function(err, result) {
 ```
 
 
+## SPIKE API Reference
+https://spike.cc/dashboard/developer/docs/api_reference
+
