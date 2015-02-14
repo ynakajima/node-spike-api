@@ -1,0 +1,61 @@
+{
+  "name": "spike-api",
+  "version": "0.5.0",
+  "description": "SPIKE REST API client library for node.js",
+  "main": "./lib/spike-api.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "npm run lint && mocha",
+    "lint": "jshint lib/*.js test/*.js && echo Lint passed.",
+    "actual-test": "npm run lint && env ACTUAL_TEST=1 mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/ynakajima/node-spike-api.git"
+  },
+  "keywords": [
+    "SPIKE",
+    "eCommerce",
+    "transactions"
+  ],
+  "author": "Yuhta Nakajima <yuhta.nakajima@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ynakajima/node-spike-api/issues"
+  },
+  "homepage": "https://github.com/ynakajima/node-spike-api",
+  "devDependencies": {
+    "mocha": "^2.1.0",
+    "chai": "^2.0.0",
+    "jshint": "^2.6.0",
+    "nock": "^0.59.1"
+  },
+  "jshintConfig": {
+    "strict": true,
+    "undef": true,
+    "unused": true,
+    "nonbsp": true,
+    "trailing": true,
+    "curly": true,
+    "eqeqeq": true,
+    "freeze": true,
+    "indent": 2,
+    "newcap": true,
+    "quotmark": "single",
+    "maxdepth": 3,
+    "maxstatements": 20,
+    "maxlen": 80,
+    "eqnull": true,
+    "funcscope": true,
+    "node": true,
+    "debug": true,
+    "devel": true,
+    "mocha": true
+  },
+  "dependencies": {
+    "lodash": "^3.2.0",
+    "request": "^2.53.0"
+  }
+}
