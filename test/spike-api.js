@@ -4,6 +4,17 @@ var should = require('chai').should();
 var nock = require('nock');
 var SpikeAPI = require('../lib/spike-api').SpikeAPI;
 var Product = require('../lib/spike-api').Product;
+var products = [
+    new Product({
+      id: '0001',
+      title: 'product A',
+      description: 'desc',
+      price: 1000,
+      currency: 'JPY',
+      count: 1,
+      stock: 100
+    })
+  ];
 
 var isActualTest = typeof process.env.ACTUAL_TEST !== 'undefined';
 var testConfig = isActualTest ?
@@ -34,17 +45,6 @@ describe('SpikeAPI', function() {
    * SpileAPI#postCharge()
    */
   describe('#postCharge()', function() {
-    var products = [
-      new Product({
-        id: '0001',
-        title: 'product A',
-        description: 'desc',
-        price: 1000,
-        currency: 'JPY',
-        count: 1,
-        stock: 100
-      })
-    ];
 
     it('should return an error when invalid arguments.', function(done) {
       var client = new SpikeAPI();
@@ -157,6 +157,7 @@ describe('SpikeAPI', function() {
 
   });
 
+
   /**
    * SpileAPI#getCharge()
    */
@@ -249,6 +250,127 @@ describe('SpikeAPI', function() {
         result.should.to.have.property('refunded', false);
         result.should.to.have.property('amount_refunded', null);
         done();
+      });
+    });
+  });
+
+
+  /**
+   * SpileAPI#postRefund()
+   */
+  describe('#postRefund()', function() {
+
+    it('should return an error when invalid arguments.', function(done) {
+      var client = new SpikeAPI();
+      client.postRefund('', function(err) {
+        err.should.to.be.an.instanceof(Error);
+        done();
+      });
+    });
+
+    it('should throw an error ' +
+         'when invalid arguments and no callback.', function() {
+      var client = new SpikeAPI();
+      client.postRefund.should.throw(Error);
+    });
+
+    it('should return an error when invalid secret key.', function(done) {
+      if (!isActualTest) {
+        nock('https://api.spike.cc/')
+          .post('/v1/charges/xxxxx/refund')
+          .reply(401, {}, {
+            Status: '401 Unauthorized'
+          });
+      }
+      var client = new SpikeAPI();
+      client.postRefund('xxxxx', function(err) {
+        err.should.to.be.an.instanceof(Error);
+        err.should.to.have.property('message', '401 Unauthorized');
+        done();
+      });
+    });
+
+    it('should return an error when invalid charge id.', function(done) {
+      var invalidID = 'invalid-id';
+      if (!isActualTest) {
+        nock('https://api.spike.cc/')
+          .post('/v1/charges/' + invalidID + '/refund')
+          .reply(400, {
+            error: {
+              type: 'invalid_request_error'
+            }
+          }, {
+            Status: '400 Bad Request'
+          });
+      }
+      var client = new SpikeAPI({secretKey: testConfig.secretKey});
+      client.postRefund(invalidID, function(err, result) {
+        err.should.to.be.an.instanceof(Error);
+        err.should.to.have.property('message', '400 Bad Request');
+        result.should.to.have.property('error');
+        result.error.should.to.have.property(
+          'type', 'invalid_request_error');
+        done();
+      });
+    });
+
+    it('should to refund the charge of the specified ID ' +
+       'when valid arguments.', function(done) {
+      // Create a new charge for refund.
+      if (!isActualTest) {
+        nock('https://api.spike.cc/')
+          .post('/v1/charges')
+          .reply(201, {
+            'id': '20150213-090658-xxxxxxxxx',
+            'created': 1423818418,
+            'paid': true,
+            'refunded': false
+          });
+      }
+      var client = new SpikeAPI({secretKey: testConfig.secretKey});
+      client.postCharge('JPY', 1080, testConfig.cardToken, products,
+          function(err, result) {
+        if (err) {
+          return done(err);
+        }
+
+        // test #postRefund()
+        var chargeID = result.id;
+        if (!isActualTest) {
+          nock('https://api.spike.cc/')
+            .post('/v1/charges/' + chargeID + '/refund')
+            .reply(200, {
+              id: chargeID,
+              object: 'charge',
+              paid: false,
+              captured: true,
+              amount: 1080,
+              currency: 'JPY',
+              refunded: true,
+              refunds: [
+                {
+                  object: 'refund',
+                  created: 1400220648,
+                  amount: 1080,
+                  currency: 'JPY'
+                }
+              ]
+            });
+        }
+
+        var client = new SpikeAPI({secretKey: testConfig.secretKey});
+        client.postRefund(chargeID, function(err, result) {
+          should.equal(err, null);
+          result.should.to.have.property('id', chargeID);
+          result.should.to.have.property('object', 'charge');
+          result.should.to.have.property('paid', false);
+          result.should.to.have.property('captured', true);
+          result.should.to.have.property('refunded', true);
+          result.should.to.have.property('refunds');
+          result.refunds[0].should.to.have.property('object', 'refund');
+          result.refunds[0].should.to.have.property('amount', 1080);
+          done();
+        });
       });
     });
   });
