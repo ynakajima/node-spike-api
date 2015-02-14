@@ -17,9 +17,6 @@ client.getChargeList(function(err, result) {
 });
 ```
 
-* hoge
- * #fuge
-
 ## Installation
 
 `npm install spike-api`
