@@ -1,4 +1,12 @@
 language: node_js
 node_js:
-  - 0.10
-after_success: 'npm run coveralls'
+- 0.12
+after_success: npm run coveralls
+deploy:
+  provider: npm
+  email: yuhta.nakajima@gmail.com
+  api_key:
+    secure: d38VPUVn9fq7WMLXus65fZ76Z4raM6D8ILUsxkYgq3AKCSpKT+o9gsCCPQ1/Z91DkEYnCmGUfhHudBYCKipjyXFM3Mgb2Zdm95/rbDxwXhD+WCpVPgBaD8LL7WSIyaR1mdyA3AFUBdVheL6Syp19QAwSABqQx9gaXE0AZWe5jRM=
+  on:
+    tags: true
+    repo: ynakajima/node-spike-api
