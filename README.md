@@ -1,5 +1,5 @@
 # SPIKE REST API for Node.js
-An asynchronous client library for the SPIKE REST API.
+An asynchronous client library for the [SPIKE](https://spike.cc/) REST API.
 
 [![Build Status](http://img.shields.io/travis/ynakajima/node-spike-api/master.svg?style=flat)](http://travis-ci.org/ynakajima/node-spike-api) [![Code Climate](http://img.shields.io/codeclimate/github/ynakajima/node-spike-api.svg?style=flat)](https://codeclimate.com/github/ynakajima/node-spike-api) [![npm version](http://img.shields.io/npm/v/spike-api.svg?style=flat)](https://www.npmjs.org/package/spike-api) ![dependencies](http://img.shields.io/david/ynakajima/node-spike-api.svg?style=flat) [![license MIT](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](https://github.com/ynakajima/node-spike-api/blob/master/LICENSE)
 
