@@ -48,8 +48,11 @@ describe('SpikeAPI', function() {
 
     it('should return an error when invalid arguments.', function(done) {
       var client = new SpikeAPI();
-      client.postCharge('', function(err) {
+      client.postCharge({
+        currency: 10  
+      }, function(err) {
         err.should.to.be.an.instanceof(Error);
+        err.message.should.to.equal('Invalid argments.');
         done();
       });
     });
@@ -177,8 +180,9 @@ describe('SpikeAPI', function() {
 
     it('should return an error when invalid arguments.', function(done) {
       var client = new SpikeAPI();
-      client.getCharge('', function(err) {
+      client.getCharge(123, function(err) {
         err.should.to.be.an.instanceof(Error);
+        err.message.should.to.equal('Invalid argments.');
         done();
       });
     });
@@ -274,8 +278,9 @@ describe('SpikeAPI', function() {
 
     it('should return an error when invalid arguments.', function(done) {
       var client = new SpikeAPI();
-      client.refundCharge('', function(err) {
+      client.refundCharge(123, function(err) {
         err.should.to.be.an.instanceof(Error);
+        err.message.should.to.equal('Invalid argments.');
         done();
       });
     });
