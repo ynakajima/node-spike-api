@@ -1,7 +1,7 @@
 {
   "name": "spike-api",
   "version": "0.0.0",
-  "description": "An asynchronous client library for the SPIKE REST API.",
+  "description": "SPIKE REST API client library for node.js",
   "main": "./lib/spike-api.js",
   "directories": {
     "test": "test"
