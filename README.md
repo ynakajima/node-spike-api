@@ -17,9 +17,6 @@ client.getChargeList(function(err, result) {
 });
 ```
 
-* hoge
- * #fuge
-
 ## Installation
 
 `npm install spike-api`
@@ -29,31 +26,31 @@ client.getChargeList(function(err, result) {
 ``POST https://api.spike.cc/v1/charges``
 
 ```javascript
-// product data
 var Product = require('spike-api').Product;
-var products = [
-  new Product({
-    id: '0001',
-    title: 'product A',
-    description: 'desc',
-    price: 1000,
-    currency: 'JPY',
-    count: 1,
-    stock: 100
-  })
-];
 
-// charge data
-var currency = 'JPY'; // 'JPY' or 'USD'
-var amount = 1080;
-var cardToken = 'CARD_TOKEN'; // Token that has been acquired in SPIKE Checkout.
+// new charge data
+var newCharge = {
+  currency: 'JPY'; // 'JPY' or 'USD'
+  amount: 1080,
+  card: 'CARD_TOKEN', // Token that has been acquired in SPIKE Checkout.
+  products: 
+    new Product({
+      id: '0001',
+      title: 'product A',
+      description: 'desc',
+      price: 1000,
+      currency: 'JPY',
+      count: 1,
+      stock: 100
+    })
+  ]
+};
 
 // POST https://api.spike.cc/v1/charges
-client.postCharge(currency, amount, cardToken, products,
-  function(err, result) {
-    if (!err) {
-      console.log(result);
-    }
+client.postCharge(newCharge, function(err, result) {
+  if (!err) {
+    console.log(result);
+  }
 });
 ```
 
