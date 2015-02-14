@@ -69,8 +69,12 @@ describe('SpikeAPI', function() {
           });
       }
       var client = new SpikeAPI();
-      client.postCharge('JPY', 1080, testConfig.cardToken, products,
-                        function(err) {
+      client.postCharge({
+        currency: 'JPY',
+        amount: 1080,
+        card: testConfig.cardToken,
+        products: products
+      }, function(err) {
         err.should.to.be.an.instanceof(Error);
         err.should.to.have.property('message', '401 Unauthorized');
         done();
@@ -92,8 +96,12 @@ describe('SpikeAPI', function() {
       var client = new SpikeAPI({
         secretKey: testConfig.secretKey
       });
-      client.postCharge('JPY', 1080, '', products,
-                        function(err, result) {
+      client.postCharge({
+        currency: 'JPY',
+        amount: 1080,
+        card: '',
+        products: products
+      }, function(err, result) {
         err.should.to.be.an.instanceof(Error);
         err.should.to.have.property('message', '400 Bad Request');
         result.should.to.have.property('error');
@@ -135,8 +143,12 @@ describe('SpikeAPI', function() {
       var client = new SpikeAPI({
         secretKey: testConfig.secretKey
       });
-      client.postCharge('JPY', 1080, testConfig.cardToken, products,
-                        function(err, result) {
+      client.postCharge({
+        currency: 'JPY',
+        amount: 1080,
+        card: testConfig.cardToken,
+        products: products
+      }, function(err, result) {
         should.equal(err, null);
         result.should.to.be.a('object');
         result.should.to.have.property('id');
@@ -328,8 +340,12 @@ describe('SpikeAPI', function() {
           });
       }
       var client = new SpikeAPI({secretKey: testConfig.secretKey});
-      client.postCharge('JPY', 1080, testConfig.cardToken, products,
-          function(err, result) {
+      client.postCharge({
+        currency: 'JPY',
+        amount: 1080,
+        card: testConfig.cardToken,
+        products: products
+      }, function(err, result) {
         if (err) {
           return done(err);
         }
