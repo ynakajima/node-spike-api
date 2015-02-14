@@ -7,9 +7,10 @@
     "test": "test"
   },
   "scripts": {
-    "test": "npm run lint && mocha",
-    "lint": "jshint lib/*.js test/*.js && echo Lint passed.",
-    "actual-test": "npm run lint && env ACTUAL_TEST=1 mocha -t 6000"
+    "test": "istanbul cover ./node_modules/mocha/bin/_mocha -- -R spec",
+    "pretest": "jshint lib/*.js test/*.js && echo Lint passed.",
+    "actual-test": "npm run lint && env ACTUAL_TEST=1 mocha -t 6000",
+    "coveralls": "cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage"
   },
   "repository": {
     "type": "git",
@@ -27,9 +28,11 @@
   },
   "homepage": "https://github.com/ynakajima/node-spike-api",
   "devDependencies": {
-    "mocha": "^2.1.0",
     "chai": "^2.0.0",
+    "coveralls": "^2.11.2",
+    "istanbul": "^0.3.5",
     "jshint": "^2.6.0",
+    "mocha": "^2.1.0",
     "nock": "^0.59.1"
   },
   "jshintConfig": {

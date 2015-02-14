@@ -1,4 +1,6 @@
 test/config.json
+.coveralls.yml
+coverage
 
 # Created by https://www.gitignore.io
 
