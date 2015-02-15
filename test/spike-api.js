@@ -25,15 +25,86 @@ var testConfig = isActualTest ?
       chargeID: '20150213-090658-xxxxxxxxx'
     };
 
-// test
+
+/**
+ * Product
+ */
+describe('Product', function() {
+  var product = null;
+
+  beforeEach(function() {
+    product = new Product();
+  });
+
+  /**
+   * constructor
+   */
+  describe('constructor', function() {
+
+    it('should create new instance.', function() {
+      product.should.to.be.an.instanceof(Product);
+      product.should.to.have.property('attrs');
+      product.attrs.should.to.have.property('id', '');
+      product.attrs.should.to.have.property('title', '');
+      product.attrs.should.to.have.property('description', '');
+      product.attrs.should.to.have.property('price', 0);
+      product.attrs.should.to.have.property('currency', '');
+      product.attrs.should.to.have.property('count', 0);
+      product.attrs.should.to.have.property('stock', 0);
+    });
+
+  });
+
+  /**
+   * Product#set()
+   */
+  describe('#set()', function() {
+
+    it('should set the value of the specified attribute name.', function() {
+      var value = (Math.random(100) * 2000).toString(10);
+      product.set.should.to.be.a('function');
+      product.set('id', value);
+      product.attrs.should.to.have.property('id', value);
+    });
+
+    it('should not set a value of on the missing attribute.', function() {
+      var value = (Math.random(100) * 2000).toString(10);
+      product.set('missing-attribute', value);
+      should.not.exist(product.attrs['missing-attribute']);
+    });
+
+  });
+
+  /**
+   * Product#get()
+   */
+  describe('#get()', function() {
+
+    it('should return the value of the specified attribute name.', function() {
+      var value = (Math.random(100) * 2000).toString(10);
+      product.attrs.id = value;
+
+      var id = product.get('id', value);
+      product.get.should.to.be.a('function');
+      id.should.to.be.equal(value);
+    });
+
+  });
+
+});
+
+
+/**
+ * SpikeAPI
+ */
 describe('SpikeAPI', function() {
 
   /**
    * constructor
    */
-  describe('SpikeAPI();', function() {
+  describe('constructor', function() {
 
-    it('should create new instance.', function(){
+    it('should create new instance.', function() {
       var client = new SpikeAPI();
       client.should.to.be.an.instanceof(SpikeAPI);
     });
@@ -480,6 +551,25 @@ describe('SpikeAPI', function() {
         result.data[0].should.to.have.property('object', 'charge');
         result.data[1].should.to.have.property('object', 'charge');
         done();
+      });
+    });
+  });
+
+
+  /**
+   * Spike#_request()
+   */
+  describe('#_request()', function() {
+
+    it('should return error when not connect to the network.', function(done) {
+      nock.disableNetConnect();
+      var url = 'https://api.spike.cc/';
+      var client = new SpikeAPI({secretKey: testConfig.secretKey});
+      var option = client.requestDefaults;
+      client._request('get', url, option, function(err) {
+        err.should.to.be.an.instanceof(Error);
+        done();
+        nock.enableNetConnect();
       });
     });
   });
