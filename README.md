@@ -192,7 +192,7 @@ client.getChargeList(limit, function(err, result) {
 }
 ```
 
-## POST Token
+## Post Token
 ``POST https://api.spike.cc/v1/tokens``
 
 ```javascript
@@ -220,12 +220,12 @@ client.postToken(cardData, function(err, result) {
   "object": "token",
   "created": 1435069120,
   "livemode": false,
-  "type": 'card',
+  "type": "card",
   "source": 
   { 
-    "object": 'card',
-    "last4": '1111',
-    "brand": 'Visa',
+    "object": "card",
+    "last4": "1111",
+    "brand": "Visa",
     "exp_month": 1,
     "exp_year": 2020,
     "name": "KATSUAKI SATO" 
@@ -233,7 +233,7 @@ client.postToken(cardData, function(err, result) {
 }
 ```
 
-## GET Token
+## Get Token
 ``GET https://api.spike.cc/v1/tokens/{TOKEN_ID}``
 
 ```javascript
@@ -252,12 +252,12 @@ client.getToken(cardToken, function(err, result) {
   "object": "token",
   "created": 1435069120,
   "livemode": false,
-  "type": 'card',
+  "type": "card",
   "source": 
   { 
-    "object": 'card',
-    "last4": '1111',
-    "brand": 'Visa',
+    "object": "card",
+    "last4": "1111",
+    "brand": "Visa",
     "exp_month": 1,
     "exp_year": 2020,
     "name": "KATSUAKI SATO" 
