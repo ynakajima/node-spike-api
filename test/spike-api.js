@@ -536,7 +536,7 @@ describe('SpikeAPI', function() {
     it('should return charge info when valid arguments.', function(done) {
       if (!isActualTest) {
         nock('https://api.spike.cc/')
-          .get('/v1/charges?limit=1')
+          .get('/v1/charges?limit=2')
           .reply(200, {
             'object': 'list',
             'url': '/v1/charges',
@@ -548,7 +548,7 @@ describe('SpikeAPI', function() {
           });
       }
       var client = new SpikeAPI({secretKey: testConfig.secretKey});
-      client.getChargeList(1, function(err, result) {
+      client.getChargeList(2, function(err, result) {
         should.equal(err, null);
         result.should.to.be.a('object');
         result.should.to.have.property('object', 'list');
@@ -621,8 +621,8 @@ describe('SpikeAPI', function() {
         'card[exp_year]': testConfig.cardExpYear,
         'card[cvc]': testConfig.cardCvc,
         'card[name]': testConfig.cardName,
-        'currency': 'JPY',
-        'email': 'test@example.com'
+        'currency': 'JPY'
+        // email is not mandatory
       };
 
       var postToken = function (data){
@@ -773,7 +773,7 @@ describe('SpikeAPI', function() {
         result.should.to.have.property('created');
         result.should.to.have.property('livemode');
         result.should.to.have.property('type', 'card');
-        result.should.to.have.property('currency', 'JPY');
+        //result.should.to.have.property('currency', 'JPY');
         result.source.should.be.a('object');
         result.source.should.to.have.property('object', 'card');
         result.source.should.to.have.property('last4', 
@@ -874,7 +874,7 @@ describe('SpikeAPI', function() {
         result.should.to.have.property('created');
         result.should.to.have.property('livemode', false);
         result.should.to.have.property('type', 'card');
-        result.should.to.have.property('currency', 'JPY');
+        //result.should.to.have.property('currency', 'JPY');
         result.source.should.to.be.a('object');
         done();
       });
