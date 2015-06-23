@@ -192,6 +192,79 @@ client.getChargeList(limit, function(err, result) {
 }
 ```
 
+## POST Token
+``POST https://api.spike.cc/v1/tokens``
+
+```javascript
+var newCard = {
+  'card[number]': 4444333322221111,
+  'card[exp_month]': 1,
+  'card[exp_year]': 2020,
+  'card[cvc]': 111,
+  'card[name]': 'KATSUAKI SATO',
+  'currency': 'JPY'
+};
+
+// POST https://api.spike.cc/v1/charges
+client.postToken(cardData, function(err, result) {
+  if (!err) {
+    console.log(result);
+  }
+});
+```
+
+#### result example:
+```json
+{ 
+  "id": "tok_xEI0RJWqwC3HqO0TQOxoGRgx",
+  "object": "token",
+  "created": 1435069120,
+  "livemode": false,
+  "type": 'card',
+  "source": 
+  { 
+    "object": 'card',
+    "last4": '1111',
+    "brand": 'Visa',
+    "exp_month": 1,
+    "exp_year": 2020,
+    "name": "KATSUAKI SATO" 
+  } 
+}
+```
+
+## GET Token
+``GET https://api.spike.cc/v1/tokens/{TOKEN_ID}``
+
+```javascript
+// POST https://api.spike.cc/v1/charges
+client.getToken(cardToken, function(err, result) {
+  if (!err) {
+    console.log(result);
+  }
+});
+```
+
+#### result example:
+```json
+{ 
+  "id": "tok_xEI0RJWqwC3HqO0TQOxoGRgx",
+  "object": "token",
+  "created": 1435069120,
+  "livemode": false,
+  "type": 'card',
+  "source": 
+  { 
+    "object": 'card',
+    "last4": '1111',
+    "brand": 'Visa',
+    "exp_month": 1,
+    "exp_year": 2020,
+    "name": "KATSUAKI SATO" 
+  } 
+}
+```
+
 
 ## SPIKE API Reference
 https://spike.cc/dashboard/developer/docs/api_reference
