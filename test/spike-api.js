@@ -2,6 +2,8 @@
 require('mocha');
 var should = require('chai').should();
 var nock = require('nock');
+var Promise = require('bluebird');
+var _ = require('lodash');
 var SpikeAPI = require('../lib/spike-api').SpikeAPI;
 var Product = require('../lib/spike-api').Product;
 var products = [
@@ -22,7 +24,12 @@ var testConfig = isActualTest ?
     {
       secretKey: 'sk_test_xxxxxxxxxxxxxxxxx',
       cardToken: 'tok_xxxxxxxxxxxxxxxxxxxx',
-      chargeID: '20150213-090658-xxxxxxxxx'
+      chargeID: '20150213-090658-xxxxxxxxx',
+      cardNumber: 4444333322221111,
+      cardExpMonth: 1,
+      cardExpYear: (new Date()).getFullYear() + 1,
+      cardCvc: 111,
+      cardName: 'KATSUAKI SATO'
     };
 
 
@@ -550,6 +557,325 @@ describe('SpikeAPI', function() {
         result.data.should.to.have.length(2);
         result.data[0].should.to.have.property('object', 'charge');
         result.data[1].should.to.have.property('object', 'charge');
+        done();
+      });
+    });
+  });
+
+
+  /**
+   * SpileAPI#postToken()
+   */
+  describe('#postToken()', function() {
+
+    it('should return an error when invalid arguments.', function(done) {
+      var client = new SpikeAPI();
+      client.postToken({
+        'card[number]': 'card number'
+      }, function(err) {
+        err.should.to.be.an.instanceof(Error);
+        err.message.should.to.equal('Invalid argments.');
+        done();
+      });
+    });
+
+    it('should throw an error ' +
+         'when invalid arguments and no callback.', function() {
+      var client = new SpikeAPI();
+      client.postToken.should.throw(Error);
+    });
+
+    it('should return an error when invalid secret key.', function(done) {
+      if (!isActualTest) {
+        nock('https://api.spike.cc/')
+          .post('/v1/tokens')
+          .reply(401, {}, {
+            Status: '401 Unauthorized'
+          });
+      }
+
+      var client = new SpikeAPI();
+      client.postToken({
+        'card[number]': testConfig.cardNumber,
+        'card[exp_month]': testConfig.cardExpMonth,
+        'card[exp_year]': testConfig.cardExpYear,
+        'card[cvc]': testConfig.cardCvc,
+        'card[name]': testConfig.cardName,
+        'currency': 'JPY',
+        'email': 'test@example.com'
+      }, function(err) {
+        err.should.to.be.an.instanceof(Error);
+        err.should.to.have.property('message', '401 Unauthorized');
+        done();
+      });
+    });
+
+    it('should return an error when invalid arguments.', function(done) {
+      var client = new SpikeAPI({
+        secretKey: testConfig.secretKey
+      });
+
+      var cardData = {
+        'card[number]': testConfig.cardNumber,
+        'card[exp_month]': testConfig.cardExpMonth,
+        'card[exp_year]': testConfig.cardExpYear,
+        'card[cvc]': testConfig.cardCvc,
+        'card[name]': testConfig.cardName,
+        'currency': 'JPY',
+        'email': 'test@example.com'
+      };
+
+      var postToken = function (data){
+        return new Promise(function (resolve){
+
+          if (!isActualTest) {
+            nock('https://api.spike.cc/')
+              .post('/v1/tokens')
+              .reply(400, {
+                error: {
+                  type: 'invalid_request_error'
+                }
+              }, {
+                Status: '400 Bad Request'
+              });
+          }
+
+          client.postToken(data, function(err, result) {
+            err.should.to.be.an.instanceof(Error);
+            err.should.to.have.property('message', '400 Bad Request');
+            result.should.to.have.property('error');
+            result.error.should.to.have.property(
+              'type', 'invalid_request_error');
+
+            resolve();
+          });
+        });
+      };
+
+      var promiseArray = Object.keys(cardData).map(function (key) {
+        var cloned = _.clone(cardData);
+        delete cloned[key];
+        return postToken(cloned);
+      });
+
+      Promise.all(promiseArray)
+      .then(function (){
+        done();
+      });
+
+    });
+
+
+    it('should return an error when invalid card number.', function(done) {
+      if (!isActualTest) {
+        nock('https://api.spike.cc/')
+          .post('/v1/tokens')
+          .reply(400, {
+            error: {
+              type: 'invalid_request_error'
+            }
+          }, {
+            Status: '400 Bad Request'
+          });
+      }
+      var client = new SpikeAPI({
+        secretKey: testConfig.secretKey
+      });
+      client.postToken({
+        'card[number]': testConfig.cardNumber * 10000,
+        'card[exp_month]': testConfig.cardExpMonth,
+        'card[exp_year]': testConfig.cardExpYear,
+        'card[cvc]': testConfig.cardCvc,
+        'card[name]': testConfig.cardName,
+        'currency': 'JPY',
+        'email': 'test@example.com'
+      }, function(err, result) {
+        err.should.to.be.an.instanceof(Error);
+        err.should.to.have.property('message', '400 Bad Request');
+        result.should.to.have.property('error');
+        result.error.should.to.have.property(
+          'type', 'invalid_request_error');
+        done();
+      });
+    });
+
+    it('should return an error when past expire year.', function(done) {
+      if (!isActualTest) {
+        nock('https://api.spike.cc/')
+          .post('/v1/tokens')
+          .reply(400, {
+            error: {
+              type: 'invalid_request_error'
+            }
+          }, {
+            Status: '400 Bad Request'
+          });
+      }
+      var client = new SpikeAPI({
+        secretKey: testConfig.secretKey
+      });
+      client.postToken({
+        'card[number]': testConfig.cardNumber,
+        'card[exp_month]': testConfig.cardExpMonth,
+        'card[exp_year]': (new Date()).getFullYear() - 1,
+        'card[cvc]': testConfig.cardCvc,
+        'card[name]': testConfig.cardName,
+        'currency': 'JPY',
+        'email': 'test@example.com'
+      }, function(err, result) {
+        err.should.to.be.an.instanceof(Error);
+        err.should.to.have.property('message', '400 Bad Request');
+        result.should.to.have.property('error');
+        result.error.should.to.have.property(
+          'type', 'invalid_request_error');
+        done();
+      });
+    });
+
+    it('should create a new token ' +
+       'when valid arguments.', function(done) {
+      if (!isActualTest) {
+        nock('https://api.spike.cc/')
+          .post('/v1/tokens')
+          .reply(201, {
+            'id': 'tok_ULkaZUOpAcAyIyGtFSEnqI2b',
+            'object': 'token',
+            'livemode': false,
+            'created': 1426059219,
+            'type': 'card',
+            'currency': 'JPY',
+            'source': {
+              'object': 'card',
+              'last4': String(testConfig.cardNumber).slice(-4),
+              'brand': 'Visa',
+              'exp_month': testConfig.cardExpMonth,
+              'exp_year': testConfig.cardExpYear,
+              'name': testConfig.cardName
+            }
+          });
+      }
+      var client = new SpikeAPI({
+        secretKey: testConfig.secretKey
+      });
+      client.postToken({
+        'card[number]': testConfig.cardNumber,
+        'card[exp_month]': testConfig.cardExpMonth,
+        'card[exp_year]': testConfig.cardExpYear,
+        'card[cvc]': testConfig.cardCvc,
+        'card[name]': testConfig.cardName,
+        'currency': 'JPY',
+        'email': 'test@example.com'
+      }, function(err, result) {
+        should.equal(err, null);
+        result.should.to.be.a('object');
+        result.should.to.have.property('id');
+        result.should.to.have.property('object', 'token');
+        result.should.to.have.property('created');
+        result.should.to.have.property('livemode');
+        result.should.to.have.property('type', 'card');
+        result.should.to.have.property('currency', 'JPY');
+        result.source.should.be.a('object');
+        result.source.should.to.have.property('object', 'card');
+        result.source.should.to.have.property('last4', 
+          String(testConfig.cardNumber).slice(-4));
+        result.source.should.to.have.property('brand');
+        result.source.should.to.have.property('exp_month', 
+          testConfig.cardExpMonth);
+        result.source.should.to.have.property('exp_year', 
+          testConfig.cardExpYear);
+        result.source.should.to.have.property('name', testConfig.cardName);
+        done();
+      });
+    });
+
+  });
+
+
+  /**
+   * SpileAPI#getToken()
+   */
+  describe('#getToken()', function() {
+
+    it('should return an error when invalid arguments.', function(done) {
+      var client = new SpikeAPI();
+      client.getToken(123, function(err) {
+        err.should.to.be.an.instanceof(Error);
+        err.message.should.to.equal('Invalid argments.');
+        done();
+      });
+    });
+
+    it('should throw an error ' +
+         'when invalid arguments and no callback.', function() {
+      var client = new SpikeAPI();
+      client.getToken.should.throw(Error);
+    });
+
+    it('should return an error when invalid secret key.', function(done) {
+      if (!isActualTest) {
+        nock('https://api.spike.cc/')
+          .get('/v1/tokens/' + testConfig.cardToken)
+          .reply(401, {}, {
+            Status: '401 Unauthorized'
+          });
+      }
+      var client = new SpikeAPI();
+      client.getToken(testConfig.cardToken, function(err) {
+        err.should.to.be.an.instanceof(Error);
+        err.should.to.have.property('message', '401 Unauthorized');
+        done();
+      });
+    });
+
+    it('should return an error when invalid token id.', function(done) {
+      var invalidTokenID = 'xxxx';
+      if (!isActualTest) {
+        nock('https://api.spike.cc/')
+          .get('/v1/tokens/' + invalidTokenID)
+          .reply(400, {
+            error: {
+              type: 'invalid_request_error'
+            }
+          }, {
+            Status: '400 Bad Request'
+          });
+      }
+      var client = new SpikeAPI({secretKey: testConfig.secretKey});
+      client.getToken(invalidTokenID, function(err, result) {
+        err.should.to.be.an.instanceof(Error);
+        err.should.to.have.property('message', '400 Bad Request');
+        result.should.to.have.property('error');
+        result.error.should.to.have.property(
+          'type', 'invalid_request_error');
+        done();
+      });
+    });
+
+    it('should return token info when valid arguments.', function(done) {
+      if (!isActualTest) {
+        nock('https://api.spike.cc/')
+          .get('/v1/tokens/' + testConfig.cardToken)
+          .reply(200, {
+            id: testConfig.cardToken,
+            object: 'token',
+            livemode: false,
+            created: 1426059219,
+            type: 'card',
+            currency: 'JPY',
+            source: {}
+          });
+      }
+      var client = new SpikeAPI({secretKey: testConfig.secretKey});
+      client.getToken(testConfig.cardToken, function(err, result) {
+        should.equal(err, null);
+        result.should.to.be.a('object');
+        result.should.to.have.property('id', testConfig.cardToken);
+        result.should.to.have.property('object', 'token');
+        result.should.to.have.property('created');
+        result.should.to.have.property('livemode', false);
+        result.should.to.have.property('type', 'card');
+        result.should.to.have.property('currency', 'JPY');
+        result.source.should.to.be.a('object');
         done();
       });
     });
