@@ -1,6 +1,6 @@
 {
   "name": "spike-api",
-  "version": "0.6.3",
+  "version": "0.7.0",
   "description": "SPIKE REST API client library for node.js",
   "main": "./lib/spike-api.js",
   "directories": {
@@ -28,6 +28,7 @@
   },
   "homepage": "https://github.com/ynakajima/node-spike-api",
   "devDependencies": {
+    "bluebird": "^2.9.30",
     "chai": "^2.0.0",
     "coveralls": "^2.11.2",
     "istanbul": "^0.3.5",

@@ -1,5 +1,10 @@
 {
   "secretKey": "SECRET_KEY",
   "cardToken": "CARD_TOKEN",
-  "chargeID": "CHARGE_ID"
+  "chargeID": "CHARGE_ID",
+  "cardNumber": 4444333322221111,
+  "cardExpMonth": 1,
+  "cardExpYear": 2020,
+  "cardCvc": 111,
+  "cardName": "KATSUAKI SATO"
 }
