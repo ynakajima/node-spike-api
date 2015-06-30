@@ -22,6 +22,10 @@
     "transactions"
   ],
   "author": "Yuhta Nakajima <yuhta.nakajima@gmail.com>",
+  "contributors": [
+    "Yuhta Nakajima <yuhta.nakajima@gmail.com>",
+    "takayukii <takayukii@gmail.com>"
+  ],
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/ynakajima/node-spike-api/issues"
