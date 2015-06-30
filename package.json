@@ -1,6 +1,6 @@
 {
   "name": "spike-api",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "description": "SPIKE REST API client library for node.js",
   "main": "./lib/spike-api.js",
   "directories": {
@@ -22,6 +22,10 @@
     "transactions"
   ],
   "author": "Yuhta Nakajima <yuhta.nakajima@gmail.com>",
+  "contributors": [
+    "Yuhta Nakajima <yuhta.nakajima@gmail.com>",
+    "takayukii <takayukii@gmail.com>"
+  ],
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/ynakajima/node-spike-api/issues"

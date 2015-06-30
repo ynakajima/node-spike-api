@@ -265,7 +265,13 @@ client.getToken(cardToken, function(err, result) {
 }
 ```
 
-
 ## SPIKE API Reference
 https://spike.cc/dashboard/developer/docs/api_reference
 
+
+## Contributors
+* Yuhta Nakajima <yuhta.nakajima@gmail.com>
+* takayukii <takayukii@gmail.com>
+
+## License
+MIT License. &copy;2015 Yuhta Nakajima
