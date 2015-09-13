@@ -248,6 +248,62 @@ describe('SpikeAPI', function() {
       });
     });
 
+    it('should create a new charge (authorization) ' +
+       'when valid arguments.', function(done) {
+      if (!isActualTest) {
+        nock('https://api.spike.cc/')
+          .post('/v1/charges')
+          .reply(201, {
+            'id': '20150213-090658-xxxxxxxxx',
+            'object': 'charge',
+            'created': 1423818418,
+            'livemode': false,
+            'paid': true,
+            'amount': 100,
+            'currency': 'JPY',
+            'refunded': false,
+            'card': {},
+            'captured': false,
+            'refunds': [],
+            'balance_transaction': '',
+            'failure_message': null,
+            'failure_code': null,
+            'amount_refunded': null,
+            'customer': null,
+            'invoice': null,
+            'description': null,
+            'dispute': null,
+            'metadata': {},
+            'statement_description': null
+          });
+      }
+      var client = new SpikeAPI({
+        secretKey: testConfig.secretKey
+      });
+      client.postCharge({
+        currency: 'JPY',
+        amount: 100,
+        card: testConfig.cardToken,
+        capture: false,
+        products: products
+      }, function(err, result) {
+        should.equal(err, null);
+        result.should.to.be.a('object');
+        result.should.to.have.property('id');
+        result.should.to.have.property('object', 'charge');
+        result.should.to.have.property('created');
+        result.should.to.have.property('livemode');
+        result.should.to.have.property('paid', true);
+        result.should.to.have.property('captured', false);
+        result.should.to.have.property('amount', 100);
+        result.should.to.have.property('currency', 'JPY');
+        result.should.to.have.property('refunded', false);
+        result.should.to.have.property('amount_refunded', null);
+        result.should.to.have.property('refunds');
+        done();
+      });
+    });
+
   });
 
 
