@@ -102,6 +102,44 @@ client.getCharge(chargeID, function(err, result) {
 }
 ```
 
+## Capture a Charge
+``POST https://api.spike.cc/v1/charges/{CHARGE_ID}/capture``
+
+```javascript
+var chargeID = '20140609-064331-onjmfi1z5q';
+
+// POST https://api.spike.cc/v1/charges/{CHARGE_ID}/capture
+client.captureCharge(chargeID, function(err, result) {
+  if (!err) {
+    console.log(result);
+  }
+});
+```
+
+#### result example:
+```json
+{ 
+  "id": "20150913-150339-c26bvg57np",
+  "object": "charge",
+  "created": 1442156619,
+  "livemode": false,
+  "paid": true,
+  "amount": 1080,
+  "currency": "JPY",
+  "refunded": false,
+  "card": {},
+  "source": {},
+  "captured": true,
+  "refunds": [],
+  "amount_refunded": null,
+  "customer": null,
+  "description": null,
+  "dispute": null,
+  "metadata": {},
+  "statement_description": null 
+}
+```
+
 ## Refund a Charge
 ``POST https://api.spike.cc/v1/charges/{CHARGE_ID}/refund``
 
