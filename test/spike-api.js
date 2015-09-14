@@ -28,7 +28,7 @@ var testConfig = isActualTest ?
       cardNumber: 4444333322221111,
       cardExpMonth: 1,
       cardExpYear: (new Date()).getFullYear() + 1,
-      cardCvc: 111,
+      cardCvc: '012',
       cardName: 'KATSUAKI SATO'
     };
 
