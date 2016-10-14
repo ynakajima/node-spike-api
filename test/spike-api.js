@@ -248,6 +248,62 @@ describe('SpikeAPI', function() {
       });
     });
 
+    it('should create a new charge (authorization) ' +
+       'when valid arguments.', function(done) {
+      if (!isActualTest) {
+        nock('https://api.spike.cc/')
+          .post('/v1/charges')
+          .reply(201, {
+            'id': '20150213-090658-xxxxxxxxx',
+            'object': 'charge',
+            'created': 1423818418,
+            'livemode': false,
+            'paid': true,
+            'amount': 100,
+            'currency': 'JPY',
+            'refunded': false,
+            'card': {},
+            'captured': false,
+            'refunds': [],
+            'balance_transaction': '',
+            'failure_message': null,
+            'failure_code': null,
+            'amount_refunded': null,
+            'customer': null,
+            'invoice': null,
+            'description': null,
+            'dispute': null,
+            'metadata': {},
+            'statement_description': null
+          });
+      }
+      var client = new SpikeAPI({
+        secretKey: testConfig.secretKey
+      });
+      client.postCharge({
+        currency: 'JPY',
+        amount: 100,
+        card: testConfig.cardToken,
+        capture: false,
+        products: products
+      }, function(err, result) {
+        should.equal(err, null);
+        result.should.to.be.a('object');
+        result.should.to.have.property('id');
+        result.should.to.have.property('object', 'charge');
+        result.should.to.have.property('created');
+        result.should.to.have.property('livemode');
+        result.should.to.have.property('paid', true);
+        result.should.to.have.property('captured', false);
+        result.should.to.have.property('amount', 100);
+        result.should.to.have.property('currency', 'JPY');
+        result.should.to.have.property('refunded', false);
+        result.should.to.have.property('amount_refunded', null);
+        result.should.to.have.property('refunds');
+        done();
+      });
+    });
+
   });
 
 
@@ -350,6 +406,204 @@ describe('SpikeAPI', function() {
 
 
   /**
+   * SpileAPI#captureCharge()
+   */
+  describe('#captureCharge()', function() {
+
+    it('should return an error when invalid arguments.', function(done) {
+      var client = new SpikeAPI();
+      client.captureCharge(123, function(err) {
+        err.should.to.be.an.instanceof(Error);
+        err.message.should.to.equal('Invalid argments.');
+        done();
+      });
+    });
+
+    it('should throw an error ' +
+         'when invalid arguments and no callback.', function() {
+      var client = new SpikeAPI();
+      client.captureCharge.should.throw(Error);
+    });
+
+    it('should return an error when invalid secret key.', function(done) {
+      if (!isActualTest) {
+        nock('https://api.spike.cc/')
+          .post('/v1/charges/xxxxx/capture')
+          .reply(401, {}, {
+            Status: '401 Unauthorized'
+          });
+      }
+      var client = new SpikeAPI();
+      client.captureCharge('xxxxx', function(err) {
+        err.should.to.be.an.instanceof(Error);
+        err.should.to.have.property('message', '401 Unauthorized');
+        done();
+      });
+    });
+
+    it('should return an error when invalid charge id.', function(done) {
+      var invalidID = 'invalid-id';
+      if (!isActualTest) {
+        nock('https://api.spike.cc/')
+          .post('/v1/charges/' + invalidID + '/capture')
+          .reply(400, {
+            error: {
+              type: 'invalid_request_error'
+            }
+          }, {
+            Status: '400 Bad Request'
+          });
+      }
+      var client = new SpikeAPI({secretKey: testConfig.secretKey});
+      client.captureCharge(invalidID, function(err, result) {
+        err.should.to.be.an.instanceof(Error);
+        err.should.to.have.property('message', '400 Bad Request');
+        result.should.to.have.property('error');
+        result.error.should.to.have.property(
+          'type', 'invalid_request_error');
+        done();
+      });
+    });
+
+    it('should capture the charge of the specified ID ' +
+       'when valid arguments.', function(done) {
+      // Create a new charge for capture.
+      if (!isActualTest) {
+        nock('https://api.spike.cc/')
+          .post('/v1/charges')
+          .reply(201, {
+            'id': '20150213-090658-xxxxxxxxx',
+            'created': 1423818418,
+            'paid': false,
+            'refunded': false,
+            'refunds': [],
+            'captured': false
+          });
+      }
+      var client = new SpikeAPI({secretKey: testConfig.secretKey});
+      client.postCharge({
+        currency: 'JPY',
+        amount: 1080,
+        card: testConfig.cardToken,
+        capture: false,
+        products: products
+      }, function(err, result) {
+        if (err) {
+          return done(err);
+        }
+
+        // test #captureCharge()
+        var chargeID = result.id;
+        if (!isActualTest) {
+          nock('https://api.spike.cc/')
+            .post('/v1/charges/' + chargeID + '/capture')
+            .reply(200, {
+              id: chargeID,
+              object: 'charge',
+              paid: true,
+              captured: true,
+              amount: 1080,
+              currency: 'JPY',
+              refunded: false
+            });
+        }
+
+        var client = new SpikeAPI({secretKey: testConfig.secretKey});
+        client.captureCharge(chargeID, function(err, result) {
+          should.equal(err, null);
+          result.should.to.have.property('id', chargeID);
+          result.should.to.have.property('object', 'charge');
+          result.should.to.have.property('paid', true);
+          result.should.to.have.property('captured', true);
+          result.should.to.have.property('refunded', false);
+          done();
+        });
+      });
+    });
+
+    it('should return an error when capturing the captured charge', 
+      function(done) {
+      // Create a new charge for capture.
+      if (!isActualTest) {
+        nock('https://api.spike.cc/')
+          .post('/v1/charges')
+          .reply(201, {
+            'id': '20150213-090658-xxxxxxxxx',
+            'created': 1423818418,
+            'paid': false,
+            'refunded': false,
+            'refunds': [],
+            'captured': false
+          });
+      }
+      var client = new SpikeAPI({secretKey: testConfig.secretKey});
+      client.postCharge({
+        currency: 'JPY',
+        amount: 1080,
+        card: testConfig.cardToken,
+        capture: false,
+        products: products
+      }, function(err, result) {
+        if (err) {
+          return done(err);
+        }
+
+        // test #captureCharge()
+        var chargeID = result.id;
+        if (!isActualTest) {
+          nock('https://api.spike.cc/')
+            .post('/v1/charges/' + chargeID + '/capture')
+            .reply(200, {
+              id: chargeID,
+              object: 'charge',
+              paid: true,
+              captured: true,
+              amount: 1080,
+              currency: 'JPY',
+              refunded: false
+            });
+        }
+
+        var client = new SpikeAPI({secretKey: testConfig.secretKey});
+        client.captureCharge(chargeID, function(err, result) {
+          if (err) {
+            return done(err);
+          }
+          should.equal(err, null);
+          result.should.to.have.property('id', chargeID);
+          result.should.to.have.property('object', 'charge');
+          result.should.to.have.property('paid', true);
+          result.should.to.have.property('captured', true);
+          result.should.to.have.property('refunded', false);
+
+          if (!isActualTest) {
+            nock('https://api.spike.cc/')
+              .post('/v1/charges/' + chargeID + '/capture')
+              .reply(400, {
+                error: {
+                  type: 'invalid_request_error',
+                  message: 'Unable to capture order. The order is ' +
+                    'already cancelled or captured.'
+                }
+              }, {
+                Status: '400 Bad Request'
+              });
+          }
+          client.captureCharge(chargeID, function(err, result) {
+            err.should.to.be.an.instanceof(Error);
+            err.should.to.have.property('message', '400 Bad Request');
+            result.should.to.have.property('error');
+            result.error.should.to.have.property(
+              'type', 'invalid_request_error');
+            done();
+          });
+        });
+      });
+    });
+  });
+
+
+  /**
    * SpileAPI#refundCharge()
    */
   describe('#refundCharge()', function() {
@@ -409,7 +663,7 @@ describe('SpikeAPI', function() {
       });
     });
 
-    it('should to refund the charge of the specified ID ' +
+    it('should to refund the captured charge of the specified ID ' +
        'when valid arguments.', function(done) {
       // Create a new charge for refund.
       if (!isActualTest) {
@@ -464,6 +718,72 @@ describe('SpikeAPI', function() {
           result.should.to.have.property('object', 'charge');
           result.should.to.have.property('paid', false);
           result.should.to.have.property('captured', true);
+          result.should.to.have.property('refunded', true);
+          result.should.to.have.property('refunds');
+          result.refunds[0].should.to.have.property('object', 'refund');
+          result.refunds[0].should.to.have.property('amount', 1080);
+          done();
+        });
+      });
+    });
+
+    it('should to refund the non-captured charge of the specified ID ' +
+       'when valid arguments.', function(done) {
+      // Create a new charge for refund.
+      if (!isActualTest) {
+        nock('https://api.spike.cc/')
+          .post('/v1/charges')
+          .reply(201, {
+            'id': '20150213-090658-xxxxxxxxx',
+            'created': 1423818418,
+            'captured': false,
+            'paid': false,
+            'refunded': false
+          });
+      }
+      var client = new SpikeAPI({secretKey: testConfig.secretKey});
+      client.postCharge({
+        currency: 'JPY',
+        amount: 1080,
+        card: testConfig.cardToken,
+        capture: false,
+        products: products
+      }, function(err, result) {
+        if (err) {
+          return done(err);
+        }
+
+        // test #refundCharge()
+        var chargeID = result.id;
+        if (!isActualTest) {
+          nock('https://api.spike.cc/')
+            .post('/v1/charges/' + chargeID + '/refund')
+            .reply(200, {
+              id: chargeID,
+              object: 'charge',
+              paid: false,
+              captured: false,
+              amount: 1080,
+              currency: 'JPY',
+              refunded: true,
+              refunds: [
+                {
+                  object: 'refund',
+                  created: 1400220648,
+                  amount: 1080,
+                  currency: 'JPY'
+                }
+              ]
+            });
+        }
+
+        var client = new SpikeAPI({secretKey: testConfig.secretKey});
+        client.refundCharge(chargeID, function(err, result) {
+          should.equal(err, null);
+          result.should.to.have.property('id', chargeID);
+          result.should.to.have.property('object', 'charge');
+          result.should.to.have.property('paid', false);
+          result.should.to.have.property('captured', false);
           result.should.to.have.property('refunded', true);
           result.should.to.have.property('refunds');
           result.refunds[0].should.to.have.property('object', 'refund');
